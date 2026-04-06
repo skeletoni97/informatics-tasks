@@ -49,3 +49,25 @@ print(f"Самый дорогой: {most_expensive} ({max_price} руб)")
 print(f"⚠ КРИТИЧЕСКИЕ ОСТАТКИ ({len(critical_materials)}):")
 for material in critical_materials:
     print(f"- {material}: {warehouse[material]['quantity']} < {warehouse[material]['min_quantity']}")
+
+
+
+
+print("=== ВЫДАЧА МАТЕРИАЛА ===")
+material_name = input("Введите материал: ").strip().capitalize()
+# Проверка наличия материала на складе
+if material_name in warehouse:
+    issue_quantity = int(input("Введите количество: "))
+
+    # Проверка, хватает ли количества для выдачи
+    if warehouse[material_name]["quantity"] >= issue_quantity:
+        old_quantity = warehouse[material_name]["quantity"]
+        warehouse[material_name]["quantity"] -= issue_quantity
+        new_quantity = warehouse[material_name]["quantity"]
+
+        print(f"✓ Выдано {issue_quantity} единиц '{material_name}'")
+        print(f"Остаток: {old_quantity} -> {new_quantity}")
+    else:
+        print("Недостаточно материала на складе")
+else:
+    print("Материал не найден")
