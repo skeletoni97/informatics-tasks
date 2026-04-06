@@ -37,3 +37,12 @@ for material, data in warehouse.items():
 
 print("=" * 50)
 print(f"ОБЩАЯ СТОИМОСТЬ: {total_cost:.2f} руб")
+
+
+# Поиск самого дорогого материала по цене за единицу
+
+
+most_expensive = max(warehouse, key=lambda material: warehouse[material]["price"])
+print(warehouse[most_expensive]["price"])
+max_price = warehouse[most_expensive]["price"] * warehouse[most_expensive]["quantity"]
+print(f"Самый дорогой: {most_expensive} ({max_price} руб)")
