@@ -9,7 +9,7 @@ warehouse = {
 print("=" * 50)
 print("СИСТЕМА УЧЁТА СКЛАДА")
 print("=" * 50)
-print("Материал | Кол-во | Цена | Мин. | Стоимость")
+print("Материал | Кол-во |   Цена   | Мин. | Стоимость")
 print("-" * 50)
 
 total_cost = 0
@@ -30,7 +30,7 @@ for material, data in warehouse.items():
     print(
         f"{material:<8} | "
         f"{data['quantity']:<6} | "
-        f"{data['price']:<8.2f} | "
+        f"{data['price']:<8} | "
         f"{data['min_quantity']:<4} | "
         f"{cost:.2f}{critical_mark}"
     )
