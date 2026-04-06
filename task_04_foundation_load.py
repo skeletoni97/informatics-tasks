@@ -20,6 +20,5 @@ def get_work_schedule(day_number):
 
     return f"День недели: {day_name}\nРежим: {mode}"
 
-
 day_number = int(input("Введите номер дня: "))
 print(get_work_schedule(day_number))
