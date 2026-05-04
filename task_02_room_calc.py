@@ -11,7 +11,6 @@ def calculate_room_parameters(length, width, height):
         f"Стоимость покраски: {paint_cost:.2f} руб."
     )
 
-
 length = float(input("Введите длину: "))
 width = float(input("Введите ширину: "))
 height = float(input("Введите высоту: "))

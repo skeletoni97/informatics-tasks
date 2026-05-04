@@ -1,0 +1,149 @@
+from pathlib import Path
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Папка, где лежит этот Python-файл
+BASE_DIR = Path(__file__).resolve().parent
+
+# Загрузка данных
+df = pd.read_csv(BASE_DIR / '5_train.csv')
+df['datetime'] = pd.to_datetime(df['datetime'])
+
+# Словарь сезонов
+season_names = {
+    1: 'Весна',
+    2: 'Лето',
+    3: 'Осень',
+    4: 'Зима'
+}
+
+# ============================================================
+# ЗАДАНИЕ 1
+# Найдите час суток с максимальным числом поездок в выходные дни
+# ============================================================
+
+df['hour'] = df['datetime'].dt.hour
+df['dayofweek'] = df['datetime'].dt.dayofweek  # 0 = понедельник, 6 = воскресенье
+
+# Фильтруем только выходные: суббота и воскресенье
+weekend_df = df[df['dayofweek'].isin([5, 6])]
+
+# Группируем по часу и суммируем количество поездок
+hourly_stats = weekend_df.groupby('hour')['count'].sum()
+
+# Находим час с максимальным количеством поездок
+max_hour = hourly_stats.idxmax()
+max_trips = hourly_stats.max()
+
+print("ЗАДАНИЕ 1")
+print(f"Час с максимальным числом поездок в выходные дни: {max_hour}:00")
+print(f"Общее количество поездок в этот час: {max_trips}")
+
+
+# ============================================================
+# ЗАДАНИЕ 2
+# Постройте столбчатую диаграмму:
+# среднее число поездок casual и registered отдельно по сезонам
+# ============================================================
+
+seasonal_avg = df.groupby('season')[['casual', 'registered']].mean()
+seasonal_avg.index = seasonal_avg.index.map(season_names)
+
+print("\nЗАДАНИЕ 2")
+print("Среднее число поездок по сезонам:")
+print(seasonal_avg.round(2))
+
+# Строим столбчатую диаграмму
+ax = seasonal_avg.plot(
+    kind='bar',
+    figsize=(10, 6),
+    width=0.8,
+    color=["#AA304C", "#8B4581"]
+)
+
+plt.title('Среднее число поездок по сезонам', fontsize=14, fontweight='bold')
+plt.xlabel('Сезон', fontsize=11)
+plt.ylabel('Среднее количество поездок', fontsize=11)
+plt.xticks(rotation=0)
+plt.legend(title='Тип пользователя')
+plt.grid(axis='y', alpha=0.3, linestyle='--')
+plt.tight_layout()
+
+# Добавляем значения над столбцами
+for container in ax.containers:
+    ax.bar_label(container, fmt='%.1f', fontsize=9)
+
+plt.show()
+
+
+# ============================================================
+# ЗАДАНИЕ 3
+# Фильтр: найдите все наблюдения, где count > 500
+# Сколько их? В какое время года чаще всего?
+# ============================================================
+
+high_demand = df[df['count'] > 500].copy()
+
+total_high = len(high_demand)
+
+print("\nЗАДАНИЕ 3")
+print(f"Количество наблюдений, где count > 500: {total_high}")
+
+# Считаем, в каких сезонах чаще всего встречается высокий спрос
+season_counts = high_demand['season'].value_counts().sort_index()
+
+print("\nРаспределение наблюдений count > 500 по сезонам:")
+for season, count in season_counts.items():
+    print(f"{season_names[season]}: {count}")
+
+# Самый частый сезон
+most_common_season = season_counts.idxmax()
+
+print(
+    f"\nЧаще всего высокий спрос наблюдается в сезон: "
+    f"{season_names[most_common_season]}"
+)
+
+
+# ============================================================
+# ЗАДАНИЕ 4
+# Сохраните в CSV таблицу:
+# средняя температура и среднее число поездок по каждому месяцу
+# ============================================================
+
+df['month'] = df['datetime'].dt.month
+
+monthly_stats = df.groupby('month').agg(
+    avg_temperature=('temp', 'mean'),
+    avg_trips=('count', 'mean')
+).round(2)
+
+# Названия месяцев
+month_names = {
+    1: 'Январь',
+    2: 'Февраль',
+    3: 'Март',
+    4: 'Апрель',
+    5: 'Май',
+    6: 'Июнь',
+    7: 'Июль',
+    8: 'Август',
+    9: 'Сентябрь',
+    10: 'Октябрь',
+    11: 'Ноябрь',
+    12: 'Декабрь'
+}
+
+monthly_stats['month_name'] = monthly_stats.index.map(month_names)
+
+# Сохраняем таблицу в CSV рядом со скриптом
+output_file = BASE_DIR / 'monthly_bike_stats.csv'
+monthly_stats.to_csv(output_file, index_label='month')
+
+print("\nЗАДАНИЕ 4")
+print(f"Файл {output_file.name} успешно сохранён.")
+print(f"Путь к файлу: {output_file}")
+print("\nСредняя температура и среднее число поездок по месяцам:")
+print(monthly_stats)
